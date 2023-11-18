@@ -3,7 +3,7 @@ import datetime
 import pandas as pd
 from utils import perform_get_request, xml_to_load_dataframe, xml_to_gen_data
 
-def get_load_data_from_entsoe(regions, periodStart='202302240000', periodEnd='202303240000', output_path='./data'):
+def get_load_data_from_entsoe(regions, start_date='202302240000', end_date='202303240000', output_path='./data'):
     
     # TODO: There is a period range limit of 1 year for this API. Process in 1 year chunks if needed
     
@@ -17,8 +17,8 @@ def get_load_data_from_entsoe(regions, periodStart='202302240000', periodEnd='20
         'documentType': 'A65',
         'processType': 'A16',
         'outBiddingZone_Domain': 'FILL_IN', # used for Load data
-        'periodStart': periodStart, # in the format YYYYMMDDHHMM
-        'periodEnd': periodEnd # in the format YYYYMMDDHHMM
+        'periodStart': start_date, # in the format YYYYMMDDHHMM
+        'periodEnd': end_date # in the format YYYYMMDDHHMM
     }
 
     # Loop through the regions and get data for each region
@@ -30,7 +30,7 @@ def get_load_data_from_entsoe(regions, periodStart='202302240000', periodEnd='20
         response_content = perform_get_request(url, params)
 
         # Response content is a string of XML data
-        df = xml_to_load_dataframe(response_content, 'Load')
+        df = xml_to_load_dataframe(response_content)
 
         # Save the DataFrame to a CSV file
         df.to_csv(f'{output_path}/load_{region}.csv', index=False)
@@ -78,13 +78,13 @@ def get_gen_data_from_entsoe(regions, periodStart='202302240000', periodEnd='202
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Data ingestion script for Energy Forecasting Hackathon')
     parser.add_argument(
-        '--start_time', 
+        '--start_date', 
         type=lambda s: datetime.datetime.strptime(s, '%Y-%m-%d'), 
         default=datetime.datetime(2023, 1, 1), 
         help='Start time for the data to download, format: YYYY-MM-DD'
     )
     parser.add_argument(
-        '--end_time', 
+        '--end_date', 
         type=lambda s: datetime.datetime.strptime(s, '%Y-%m-%d'), 
         default=datetime.datetime(2023, 1, 2), 
         help='End time for the data to download, format: YYYY-MM-DD'
@@ -97,7 +97,7 @@ def parse_arguments():
     )
     return parser.parse_args()
 
-def main(start_time, end_time, output_path):
+def main(start_date, end_date, output_path):
     
     regions = {
         'HU': '10YHU-MAVIR----U',
@@ -112,15 +112,15 @@ def main(start_time, end_time, output_path):
     }
 
     # Transform start_time and end_time to the format required by the API: YYYYMMDDHHMM
-    start_time = start_time.strftime('%Y%m%d%H%M')
-    end_time = end_time.strftime('%Y%m%d%H%M')
+    start_date = start_date.strftime('%Y%m%d%H%M')
+    end_date = end_date.strftime('%Y%m%d%H%M')
 
     # Get Load data from ENTSO-E
-    get_load_data_from_entsoe(regions, start_time, end_time, output_path)
+    get_load_data_from_entsoe(regions, start_date, end_date, output_path)
 
     # Get Generation data from ENTSO-E
-    get_gen_data_from_entsoe(regions, start_time, end_time, output_path)
+    get_gen_data_from_entsoe(regions, start_date, end_date, output_path)
 
 if __name__ == "__main__":
     args = parse_arguments()
-    main(args.start_time, args.end_time, args.output_path)
+    main(args.start_date, args.end_date, args.output_path)
