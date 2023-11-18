@@ -12,3 +12,5 @@ Template repository to work with for the NUWE - Schneider Electric European Data
 The individual steps can be run by commenting out the respective sections in the [run_pipeline.sh](./scripts/run_pipeline.sh) file.
 
 1. Ingest data (step 1) `sh scripts/run_pipeline.sh 2022-01-01 2023-01-01 data-raw`.
+
+2. Ingest and preprocess (step 2) `sh scripts/run_pipeline.sh 2022-01-01 2023-01-01 data-raw data-processed`.
