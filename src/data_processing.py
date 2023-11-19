@@ -13,14 +13,22 @@ def load_data(file_path) -> pd.DataFrame:
     return df
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    # TODO: Handle missing values, outliers, etc.
+    """
+    clean the data. resamples in 15 min intervals and aggregtes by 1 hr
+    missing values are imputed by linear linterpolation
+    """
+    # assert all units are in "MAW"
     assert all(df["UnitName"] == "MAW")
 
-    time = pd.to_datetime(df["EndTime"].str[:-1], utc=True)
+    time = pd.to_datetime(df["StartTime"].str[:-1], utc=True)
+
     df.set_index(time, inplace=True)
+    df.drop(columns=["StartTime", "EndTime", "AreaID", "UnitName", "PsrType"], errors="ignore", inplace=True)
+    df = df[~df.index.duplicated(keep='first')]
+
+    df.resample("15T").interpolate(method="linear", directions="both", inplace=True)
 
     df_clean = df.groupby(pd.Grouper(freq="H")).sum()
-    df_clean.drop(columns=["StartTime", "EndTime", "AreaID", "UnitName", "PsrType"], errors="ignore", inplace=True)
     return df_clean
 
 def preprocess_data(df):
@@ -100,11 +108,12 @@ def main(input_path, output_path):
         data_dfs.append(data_df)
     
     data_df = reduce(lambda left, right: pd.merge(left, right, left_index=True, right_index=True, how='outer'), data_dfs)
+    data_df.interpolate(method="linear", directions="both", inplace=True)
 
     # df = load_data(input_path)
     # df_clean = clean_data(df)
     # df_processed = preprocess_data(df_clean)
-    save_data(df_clean, os.path.join(output_path, "data.csv"))
+    save_data(data_df, os.path.join(output_path, "data.csv"))
 
 if __name__ == "__main__":
     args = parse_arguments()
