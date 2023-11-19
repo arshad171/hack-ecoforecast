@@ -199,5 +199,5 @@ def main(input_path, output_path):
 
 if __name__ == "__main__":
     args = parse_arguments()
-    # main(args.input_path, args.output_path)
-    main("data-raw", "data-processed")
+    main(args.input_path, args.output_path)
+    # main("data-raw", "data-processed")

@@ -19,17 +19,19 @@ predictions_file="$7"
 # mkdir $raw_data_file
 # python src/data_ingestion.py --start_date="$start_date" --end_date="$end_date" --output_path="$raw_data_file"
 
-# Run data_processing.py
-echo "Starting data processing..."
-mkdir $processed_data_file
-python src/data_processing.py --input_path="$raw_data_file" --output_path="$processed_data_file"
+# # Run data_processing.py
+# echo "Starting data processing..."
+# mkdir $processed_data_file
+# python src/data_processing.py --input_path="$raw_data_file" --output_path="$processed_data_file"
 
 # # Run model_training.py
 # echo "Starting model training..."
+# mkdir $model_file
 # python src/model_training.py --input_file="$processed_data_file" --model_file="$model_file"
 
-# # Run model_prediction.py
-# echo "Starting prediction..."
-# python src/model_prediction.py --input_file="$test_data_file" --model_file="$model_file" --output_file="$predictions_file"
+# Run model_prediction.py
+echo "Starting prediction..."
+mkdir $predictions_file
+python src/model_prediction.py --input_file="$test_data_file" --model_file="$model_file" --output_file="$predictions_file"
 
 echo "Pipeline completed."
