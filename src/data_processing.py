@@ -20,7 +20,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     missing values are imputed by linear linterpolation
     """
     # assert all units are in "MAW"
-    assert all(df["UnitName"] == "MAW")
+    assert all(df["UnitName"] == "MAW"), "inconsistent metrics"
 
     time = pd.to_datetime(df["StartTime"].str[:-1], utc=True)
 
@@ -154,8 +154,25 @@ def main(input_path, output_path):
     # df = load_data(input_path)
     # df_clean = clean_data(df)
     # df_processed = preprocess_data(df_clean)
-    save_data(data_df, os.path.join(output_path, "data.csv"))
 
+
+    # split: train, val, test
+    split_test = int(0.2 * len(data_df))
+
+    test_df = data_df.iloc[-split_test:, :]
+    train_df = data_df.iloc[:-split_test, :]
+
+    split_val = int(0.1 * len(train_df))
+    val_df = train_df.iloc[-split_val:, :]
+    train_df = train_df.iloc[:-split_val, :]
+
+    assert len(data_df) == len(test_df) + len(train_df) + len(val_df), "data overlap!"
+
+    # save all data
+    save_data(data_df, os.path.join(output_path, "data-all.csv"))
+    save_data(train_df, os.path.join(output_path, "data-train.csv"))
+    save_data(val_df, os.path.join(output_path, "data-val.csv"))
+    save_data(test_df, os.path.join(output_path, "data-test.csv"))
 
 if __name__ == "__main__":
     args = parse_arguments()
