@@ -36,8 +36,10 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     # upsample
     df.resample("15T").interpolate(method="linear", directions="both", inplace=True)
     # aggregate
-
     df_clean = df.groupby(pd.Grouper(freq="H")).sum()
+
+    df_clean.interpolate(method="linear", directions="both", inplace=True)
+
     return df_clean
 
 
@@ -127,7 +129,7 @@ def main(input_path, output_path):
             filter(lambda col: col.startswith("quantity"), region_df.columns)
         )
 
-        data_df = pd.DataFrame(
+        region_df = pd.DataFrame(
             data={
                 f"green_energy_{region}": region_df[cols_to_add].sum(axis=1),
                 f"{region}_Load": region_df["Load"],
@@ -135,7 +137,9 @@ def main(input_path, output_path):
             index=region_df.index,
         )
 
-        data_dfs.append(data_df)
+        region_df.interpolate(method="linear", direction="both", inplace=True)
+
+        data_dfs.append(region_df)
 
     # merge all regions for final csv
     data_df = reduce(
@@ -144,6 +148,7 @@ def main(input_path, output_path):
         ),
         data_dfs,
     )
+
     data_df.interpolate(method="linear", directions="both", inplace=True)
 
     # df = load_data(input_path)
@@ -154,5 +159,5 @@ def main(input_path, output_path):
 
 if __name__ == "__main__":
     args = parse_arguments()
-    main(args.input_path, args.output_path)
-    # main("data-raw", "data-processed")
+    # main(args.input_path, args.output_path)
+    main("data-raw", "data-processed")
