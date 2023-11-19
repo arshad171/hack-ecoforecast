@@ -1,6 +1,7 @@
 from functools import reduce
 import os
 import pandas as pd
+import json
 
 import argparse
 
@@ -18,6 +19,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     clean the data. resamples in 15 min intervals and aggregtes by 1 hr
     missing values are imputed by linear linterpolation
+    returns: clean dataframe
     """
     # assert all units are in "MAW"
     assert all(df["UnitName"] == "MAW"), "inconsistent metrics"
@@ -43,10 +45,24 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     return df_clean
 
 
-def preprocess_data(df):
-    # TODO: Generate new features, transform existing features, resampling, etc.
+def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    preprocesses the data. scaling
+    returns: df, transformations (dict, which can be saved as json for later use)
+    """
 
-    return df_processed
+    means = df.mean(axis=0)
+    stds = df.std(axis=0)
+
+    df_processed = (df - means) / stds
+
+    transformations = {
+        "columns": df_processed.columns.tolist(),
+        "means": means.to_numpy().tolist(),
+        "stds": stds.to_numpy().tolist(),
+    }
+
+    return df_processed, transformations
 
 
 def save_data(df: pd.DataFrame, output_file):
@@ -150,11 +166,10 @@ def main(input_path, output_path):
     )
 
     data_df.interpolate(method="linear", directions="both", inplace=True)
+    data_df, transformations = preprocess_data(data_df)
 
     # df = load_data(input_path)
     # df_clean = clean_data(df)
-    # df_processed = preprocess_data(df_clean)
-
 
     # split: train, val, test
     split_test = int(0.2 * len(data_df))
@@ -173,6 +188,14 @@ def main(input_path, output_path):
     save_data(train_df, os.path.join(output_path, "data-train.csv"))
     save_data(val_df, os.path.join(output_path, "data-val.csv"))
     save_data(test_df, os.path.join(output_path, "data-test.csv"))
+
+    # dump transformations
+    json.dump(
+        transformations,
+        open(os.path.join(output_path, "transformations.json"), mode="w"),
+        indent=4,
+    )
+
 
 if __name__ == "__main__":
     args = parse_arguments()
