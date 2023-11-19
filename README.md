@@ -14,6 +14,20 @@ The individual steps can be run by commenting out the respective sections in the
 Run the following:
 `sh scripts/run_pipeline.sh 2022-01-01 2023-01-01 data-raw data-processed models data-processed predictions`
 
+# Repository
+
+Practices:
+
+- Requirements
+
+- Best practices are followed by writing clean and efficient code (utilize numpy/TF ops whereever possible).
+
+- The code is typed to provide documentation and type hints.
+
+- All the configs and hyperparams go under [config](./src/config.py).
+
+- All the constatns are defiend in [constants](./src/constants.py).
+
 # Documentation
 
 - [Data Analysis](./data-analysis.md)
