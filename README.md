@@ -14,5 +14,8 @@ The individual steps can be run by commenting out the respective sections in the
 Run the following:
 `sh scripts/run_pipeline.sh 2022-01-01 2023-01-01 data-raw data-processed models data-processed predictions`
 
-# Data Analysis
+# Documentation
 
+- [Data Analysis](./data-analysis.md)
+
+- [Machine Learning](./machine-learning.md)
