@@ -10,13 +10,14 @@ Template repository to work with for the NUWE - Schneider Electric European Data
 # Running the Pipeline (Examples)
 
 The individual steps can be run by commenting out the respective sections in the [run_pipeline.sh](./scripts/run_pipeline.sh) file. **All the parameters passed here are folder names, rather than specific a filename**. This will make it easier to dump all the necessary data at each state.
+**The results within the same folder will be overriden. Use a different foldername if multiple copies are required**
 
 Run the following:
 `sh scripts/run_pipeline.sh 2022-01-01 2023-01-01 data-raw data-processed models data-processed predictions`
 
 # Repository
 
-Practices:
+Good Practices:
 
 - Requirements
 
