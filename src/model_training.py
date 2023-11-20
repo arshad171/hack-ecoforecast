@@ -5,6 +5,7 @@ import argparse
 import tensorflow as tf
 
 from data_utils import *
+from lstm_model import LSTMModel
 
 
 def load_data(file_path):
@@ -37,14 +38,15 @@ def train_model(ds_train, ds_val):
         history: training history
     """
     # TODO: Initialize your model and train it
-    model = tf.keras.Sequential(
-        [
-            tf.keras.layers.InputLayer(input_shape=(LENGTH, INPUT_SIZE)),
-            tf.keras.layers.LSTM(units=20),
-            tf.keras.layers.Dense(units=25, activation="relu"),
-            tf.keras.layers.Dense(units=INPUT_SIZE),
-        ]
-    )
+    # model = tf.keras.Sequential(
+    #     [
+    #         tf.keras.layers.InputLayer(input_shape=(LENGTH, INPUT_SIZE)),
+    #         tf.keras.layers.LSTM(units=20),
+    #         tf.keras.layers.Dense(units=25, activation="relu"),
+    #         tf.keras.layers.Dense(units=INPUT_SIZE),
+    #     ]
+    # )
+    model = LSTMModel(input_dim=INPUT_SIZE, time_dim=LENGTH, num_classes=9)
 
     model.compile(
         loss="mae",
