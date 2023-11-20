@@ -46,7 +46,7 @@ def train_model(ds_train, ds_val):
     #         tf.keras.layers.Dense(units=INPUT_SIZE),
     #     ]
     # )
-    model = LSTMModel(input_dim=INPUT_SIZE, time_dim=LENGTH, num_classes=9)
+    model = LSTMModel(input_dim=INPUT_SIZE, time_dim=TIME_LENGTH, num_classes=9)
 
     model.compile(
         loss="mae",
